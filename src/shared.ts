@@ -1,8 +1,4 @@
-import { RequestQueueV2, Dataset, Configuration } from 'crawlee';
-
-if (process.env.IN_WORKER_THREAD) {
-    Configuration.getGlobalConfig().set('purgeOnStart', false);
-}
+import { RequestQueueV2 } from 'crawlee';
 
 // Create the request queue that also supports parallelization
 let queue: RequestQueueV2;

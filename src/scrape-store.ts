@@ -17,18 +17,19 @@ if (!process.env.IN_WORKER_THREAD) {
     const inDev = import.meta.url.endsWith('.ts');
     const currentFile = new URL(import.meta.url).pathname;
 
+    // Store a promise per worker, so we wait for all to finish before exiting the main process
     const promises = [];
 
-    // You can decide how many threads you want to spawn, but keep in mind you can only spawn so many before you overload your machine
+    // You can decide how many workers you want to spawn, but keep in mind you can only spawn so many before you overload your machine
     // Or maybe you spawn multiple actors if you run on Apify Cloud! 👀
     for (let i = 0; i < 2; i++) {
         const proc = fork(inDev ? tsx : currentFile, inDev ? [currentFile] : [], {
-            // // We pass this env var to the worker thread so that it knows it's a worker process (due to having to have a fallback for dev mode)
             env: {
                 // Share the current process's env across to the newly created process
                 ...process.env,
                 // ...but also tell the process that it's a worker process
                 IN_WORKER_THREAD: 'true',
+                // ...as well as which worker it is
                 WORKER_INDEX: String(i),
             },
         });
@@ -73,6 +74,10 @@ if (!process.env.IN_WORKER_THREAD) {
     // or a configuration option. This is just for show 😈
     workerLogger.setLevel(log.LEVELS.DEBUG);
 
+    // Disable the automatic purge on start
+    // This is needed when running locally, as otherwise multiple processes will try to clear the default storage (and that will cause clashes)
+    Configuration.getGlobalConfig().set('purgeOnStart', false);
+
     // Get the request queue
     const requestQueue = await getOrInitQueue(false);
 
@@ -95,7 +100,7 @@ if (!process.env.IN_WORKER_THREAD) {
         },
         // Get the queue
         requestQueue,
-        // Let's also limit the crawler's concurrency, we don't want to be too evil 😈
+        // Let's also limit the crawler's concurrency, we don't want to overload a single process 🐌
         maxConcurrency: 5,
     }, config);
 
