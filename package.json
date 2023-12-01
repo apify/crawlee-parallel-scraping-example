@@ -1,0 +1,32 @@
+{
+    "name": "crawlee-parallel-scraping-example",
+    "version": "0.0.1",
+    "type": "module",
+    "description": "This is an example of a Crawlee project.",
+    "dependencies": {
+        "crawlee": "^3.0.0",
+        "playwright": "*"
+    },
+    "devDependencies": {
+        "@apify/eslint-config-ts": "^0.4.1",
+        "@apify/tsconfig": "^0.1.0",
+        "@types/node": "^20.0.0",
+        "@typescript-eslint/eslint-plugin": "^6.13.1",
+        "@typescript-eslint/parser": "^6.13.1",
+        "eslint": "^8.54.0",
+        "tsx": "^4.4.0",
+        "typescript": "~5.3.0"
+    },
+    "scripts": {
+        "start": "npm run start:dev",
+        "start:prod:prepare-queue": "node dist/prepare-queue.js",
+        "start:prod:scrape-store": "node dist/scrape-store.js",
+        "start:dev:prepare-queue": "tsx src/prepare-queue.ts",
+        "start:dev:scrape-store": "tsx src/scrape-store.ts",
+        "build": "tsc",
+        "test": "echo \"Error: oops, the actor has no tests yet, sad!\" && exit 1",
+        "postinstall": "npx crawlee install-playwright-browsers"
+    },
+    "author": "It's not you it's me",
+    "license": "ISC"
+}
